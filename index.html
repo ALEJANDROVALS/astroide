@@ -1,94 +1,163 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Astroi IA Asistente</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-        }
-
-        .chat-container {
-            width: 90%;
-            max-width: 800px;
-            height: 80vh; /* Adjust height as needed */
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            /* This area could be used for custom messages if you want to add them */
-        }
-
-        .chat-input {
-            padding: 15px;
-            border-top: 1px solid #eee;
-            display: flex;
-        }
-
-        .chat-input input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        .chat-input button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .chat-input button:hover {
-            background-color: #218838;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Astroid IA - Chat Hacker</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #0b1226;
+      font-family: 'Share Tech Mono', monospace;
+      color: #0ff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: #06101a;
+      padding: 1em 2em;
+      text-align: center;
+      font-size: 1.8rem;
+      letter-spacing: 0.2em;
+      border-bottom: 1px solid #005f73;
+      user-select: none;
+    }
+    #info {
+      padding: 1em 2em;
+      font-size: 0.9rem;
+      color: #0ff;
+      border-bottom: 1px solid #005f73;
+      user-select: none;
+    }
+    #chat {
+      flex: 1;
+      padding: 1em 2em;
+      overflow-y: auto;
+      background: #071627;
+      border-top: 1px solid #005f73;
+      border-bottom: 1px solid #005f73;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6em;
+      font-size: 1rem;
+      line-height: 1.4;
+      user-select: none;
+    }
+    .message {
+      background: rgba(0,255,255,0.1);
+      border: 1px solid #00ffff50;
+      border-left: 4px solid #00ffff;
+      padding: 0.6em 1em;
+      border-radius: 4px;
+      max-width: 90%;
+      white-space: pre-wrap;
+      box-shadow: 0 0 8px #00ffff33;
+      filter: drop-shadow(0 0 2px #00ffffaa);
+    }
+    #open-chat-btn {
+      background: #001f3f;
+      border: 1.5px solid #00ffff;
+      color: #00ffff;
+      padding: 0.7em 1.5em;
+      margin: 1em 2em 2em;
+      font-size: 1.1rem;
+      font-family: 'Share Tech Mono', monospace;
+      cursor: pointer;
+      border-radius: 5px;
+      align-self: center;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+      user-select: none;
+    }
+    #open-chat-btn:hover {
+      background: #00ffff;
+      color: #001f3f;
+      box-shadow: 0 0 12px #00ffffcc;
+    }
+    /* Scrollbar */
+    #chat::-webkit-scrollbar {
+      width: 8px;
+    }
+    #chat::-webkit-scrollbar-thumb {
+      background: #00aaff88;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            ASTROID IA ASISTENTE
-        </div>
-        <div class="chat-messages">
-            <p style="text-align: center; color: #666;">Presion el icono de Astroid para comenzar...</p>
-        
-        </div>
-        <div class="chat-input" style="display: none;">
-            <input type="text" placeholder="Escribe tu mensaje...">
-            <button>Enviar</button>
-        </div>
-    </div>
+  <header>ASTROID IA</header>
+  <section id="info">
+    <strong>Astroid IA</strong>, creada por <em>Alejandro Valladares</em>.<br />
+    Bienvenido al sistema de datos en tiempo real.
+  </section>
+  <section id="chat" aria-live="polite" aria-atomic="false" role="log"></section>
+  <button id="open-chat-btn" aria-label="Abrir chat web de Astroid IA">Abrir Chat Web</button>
 
-    <script src="https://cdn.botpress.cloud/webchat/v3.0/inject.js"></script>
-    <script src="https://files.bpcontent.cloud/2025/07/15/00/20250715001129-C80UXJMP.js"></script>
+  <script src="https://cdn.botpress.cloud/webchat/v3.0/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2025/07/15/00/20250715001129-C80UXJMP.js"></script>
+
+  <script>
+    const chatEl = document.getElementById('chat');
+    const openChatBtn = document.getElementById('open-chat-btn');
+
+    // Mensajes "IA" aleatorios tipo datos / texto hacker
+    const dataLines = [
+      '>>> Cargando módulos de red...',
+      '>> Conexión establecida con nodo 0xA3F29B',
+      '>>> Análisis de patrones en curso...',
+      '>> Extrayendo metadatos del servidor proxy',
+      '>>> Paquetes cifrados transmitidos: 1,024,785',
+      '>> Identidad verificada: Astroid IA',
+      '>>> Shell seguro activo en puerto 2222',
+      '>> Sistema inmune activo - analizando amenazas',
+      '>>> Recibiendo actualización de firmware v4.2.1',
+      '>> Datos sensor IoT conectados y sincronizados',
+      '>>> Mapeo de red completo en 0.023s',
+      '>> Algoritmo de predicción neural iniciado',
+      '>>> Anomalía detectada - aplicando parches',
+      '>> Almacenamiento en la nube: 98% disponible',
+      '>>> Backup incremental realizado correctamente',
+      '>> Validando integridad de datos locales',
+      '>>> Nodo Astroid sincronizado con blockchain',
+      '>> Estadísticas de tráfico: 12,437 paquetes/s',
+      '>>> Inteligencia artificial lista para interacción',
+      '>> Sistema: Astroid IA, creada por Alejandro Valladares'
+    ];
+
+    // Función para mostrar mensaje IA
+    function addIAMessage(text) {
+      const msg = document.createElement('div');
+      msg.classList.add('message');
+      msg.textContent = text;
+      chatEl.appendChild(msg);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    // Muestra mensajes IA aleatorios cada 2.5s
+    let index = 0;
+    function showRandomMessage() {
+      addIAMessage(dataLines[index]);
+      index = (index + 1) % dataLines.length;
+    }
+
+    // Inicialmente muestra 3 mensajes rápidos
+    for(let i=0; i<3; i++) {
+      showRandomMessage();
+    }
+
+    setInterval(showRandomMessage, 2500);
+
+    // Botón que abre el chat web de Botpress
+    openChatBtn.addEventListener('click', () => {
+      if(window.botpressWebChat) {
+        window.botpressWebChat.sendEvent({ type: 'show' });
+      }
+    });
+  </script>
 </body>
-</html>
+</html> 
