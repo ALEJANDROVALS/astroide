@@ -1,94 +1,94 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Astroid Virtual Assistant</title>
-    <link rel="icon" type="image/svg+xml" href="https://app.botpress.cloud/favicon/bp.svg" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astroi IA Asistente</title>
     <style>
-      body {
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
 
-      .bpWebchat {
-        border-radius: 0 !important;
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        width: 100% !important;
-        height: 100% !important;
-        border: none;
-      }
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh; /* Adjust height as needed */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-      /* Estilos adicionales para mejorar la apariencia */
-      .bpContainer {
-        border: none;
-      }
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
 
-      .bpHeaderContentContainer, .bpHeaderContainer, .bpContainer {
-        border: none;
-        border-radius: 0 !important;
-      }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            /* This area could be used for custom messages if you want to add them */
+        }
 
-      .bpHeaderContentActionsIcons {
-        display: none;
-      }
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .chat-input button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-input button:hover {
+            background-color: #218838;
+        }
     </style>
-  </head>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            ASTROID IA ASISTENTE
+        </div>
+        <div class="chat-messages">
+            <p style="text-align: center; color: #666;">Presion el icono de Astroid para comenzar...</p>
+        
+        </div>
+        <div class="chat-input" style="display: none;">
+            <input type="text" placeholder="Escribe tu mensaje...">
+            <button>Enviar</button>
+        </div>
+    </div>
 
-  <body>
-    <script src="https://cdn.botpress.cloud/webchat/v3.0/inject.js" async></script>
-    <script>
-      window.addEventListener('load', () => {
-        const initializeChat = () => {
-          if (typeof window.botpress !== 'undefined') {
-            try {
-              window.botpress.open();
-            } catch (error) {
-              console.error('Error opening Botpress:', error);
-            }
-
-            window.botpress.on('webchat:initialized', () => {
-              window.botpress.open();
-              let interval = setInterval(() => {
-                window.botpress.open();
-                if (window.botpress.state === 'opened') {
-                  clearInterval(interval);
-                }
-              }, 50);
-
-              try {
-                const doc = window.botpress.webchatIframe.contentDocument;
-                const style = doc.createElement('style');
-                style.innerHTML = `
-                  .bpContainer {
-                    border: none;
-                  }
-                  .bpHeaderContentContainer, .bpHeaderContainer, .bpContainer {
-                    border: none;
-                    border-radius: 0 !important;
-                  }
-                  .bpHeaderContentActionsIcons {
-                    display: none;
-                  }
-                `;
-                doc.body.appendChild(style);
-              } catch (error) {
-                console.error('Error applying styles:', error);
-              }
-            });
-          } else {
-            console.error('Botpress is not defined. Retrying...');
-            setTimeout(initializeChat, 100); // Retry after 100ms
-          }
-        };
-
-        initializeChat(); // Initial call to set up the chat
-      });
-    </script>
-    <script src="https://files.bpcontent.cloud/2025/07/15/00/20250715001129-C80UXJMP.js" async></script>
-  </body>
+    <script src="https://cdn.botpress.cloud/webchat/v3.0/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2025/07/15/00/20250715001129-C80UXJMP.js"></script>
+</body>
 </html>
