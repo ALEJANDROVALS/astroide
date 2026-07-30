@@ -64,6 +64,11 @@
             transform: translateY(-100%);
             pointer-events: none;
         }
+
+        /* Sidebar */
+        #sidebar {
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
     </style>
 </head>
 <body class="selection:bg-red-600 selection:text-white antialiased">
@@ -80,17 +85,6 @@
                     <button data-nav="movies" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-film"></i> Películas</button>
                     <button data-nav="series" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-tv"></i> Series</button>
                     <button data-nav="anime" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-desktop"></i> Anime</button>
-                    
-                    <!-- Nuevas secciones -->
-                    <button data-nav="prime" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-play"></i> Prime Video</button>
-                    <button data-nav="appletv" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-apple"></i> Apple TV</button>
-                    <button data-nav="hulu" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-tv"></i> Hulu</button>
-                    <button data-nav="estrenos" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-calendar"></i> Estrenos</button>
-                    <button data-nav="paramount" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-play"></i> Paramount+</button>
-                    <button data-nav="amc" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-film"></i> AMC+</button>
-                    <button data-nav="adultswim" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-water"></i> Adult Swim</button>
-
-                    <button data-nav="favorites" class="nav-btn flex items-center gap-2 transition text-gray-300 hover:text-white"><i class="fa-solid fa-bookmark"></i> Mi Lista</button>
                 </div>
             </div>
 
@@ -100,7 +94,7 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
                 </form>
                 
-                <button id="mobile-menu-btn" class="lg:hidden text-white p-2">
+                <button id="sidebar-toggle" class="text-white p-2 hover:text-red-500 transition">
                     <i class="fa-solid fa-bars text-2xl"></i>
                 </button>
             </div>
@@ -117,20 +111,31 @@
                 <button data-nav="movies" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-film"></i> Películas</button>
                 <button data-nav="series" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-tv"></i> Series</button>
                 <button data-nav="anime" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-desktop"></i> Anime</button>
-                
-                <!-- Nuevas secciones en móvil -->
-                <button data-nav="prime" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-play"></i> Prime Video</button>
-                <button data-nav="appletv" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-apple"></i> Apple TV</button>
-                <button data-nav="hulu" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-tv"></i> Hulu</button>
-                <button data-nav="estrenos" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-calendar"></i> Estrenos</button>
-                <button data-nav="paramount" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-play"></i> Paramount+</button>
-                <button data-nav="amc" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-film"></i> AMC+</button>
-                <button data-nav="adultswim" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-water"></i> Adult Swim</button>
-
-                <button data-nav="favorites" class="nav-btn flex items-center gap-3 p-3 rounded transition font-bold text-lg text-gray-400"><i class="fa-solid fa-bookmark"></i> Mi Lista</button>
             </div>
         </div>
     </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 right-0 h-full w-72 bg-zinc-950 border-l border-zinc-800 z-50 translate-x-full overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-bold">Plataformas</h2>
+                <button id="sidebar-close" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-col gap-2">
+                <button data-nav="prime" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-play text-orange-500"></i> Prime Video</button>
+                <button data-nav="appletv" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-apple text-white"></i> Apple TV+</button>
+                <button data-nav="hulu" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-tv text-green-500"></i> Hulu</button>
+                <button data-nav="paramount" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-play text-blue-500"></i> Paramount+</button>
+                <button data-nav="amc" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-film text-red-500"></i> AMC+</button>
+                <button data-nav="nickelodeon" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-child text-yellow-400"></i> Nickelodeon</button>
+                <button data-nav="estrenos" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-calendar text-purple-500"></i> Estrenos</button>
+            </div>
+        </div>
+    </div>
 
     <main id="app-content" class="min-h-screen pb-12">
         <!-- Content gets injected here by JavaScript -->
@@ -211,7 +216,7 @@
         const detailsModal = document.getElementById('details-modal');
         const detailsContent = document.getElementById('details-content');
         const videoPlayer = document.getElementById('video-player');
-        
+        const sidebar = document.getElementById('sidebar');
         
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
@@ -226,10 +231,20 @@
             }
         });
 
-        // Mobile Menu Toggle
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+        // Sidebar
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            sidebar.classList.toggle('translate-x-full');
         });
+        document.getElementById('sidebar-close').addEventListener('click', () => {
+            sidebar.classList.add('translate-x-full');
+        });
+
+        // Mobile Menu Toggle
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
 
         // Fetch Wrapper
         async function fetchAPI(url) {
@@ -342,9 +357,17 @@
 
             const rowId = `scroll-row-${containerId}`;
             
+            // Siempre incluir botón "Ver más"
             let viewMoreBtn = '';
             if (viewMoreConfig) {
                 const configStr = encodeURIComponent(JSON.stringify(viewMoreConfig));
+                viewMoreBtn = `<button data-view-more="${configStr}" class="text-sm md:text-base font-semibold text-gray-400 hover:text-white transition flex items-center gap-1">
+                                Ver más <i class="fa-solid fa-chevron-right text-xs"></i>
+                               </button>`;
+            } else if (fetchUrl) {
+                // Si no hay config explícita, crear una genérica
+                const defaultConfig = {title: title, fetchUrl: fetchUrl, mediaType: mediaType};
+                const configStr = encodeURIComponent(JSON.stringify(defaultConfig));
                 viewMoreBtn = `<button data-view-more="${configStr}" class="text-sm md:text-base font-semibold text-gray-400 hover:text-white transition flex items-center gap-1">
                                 Ver más <i class="fa-solid fa-chevron-right text-xs"></i>
                                </button>`;
@@ -446,7 +469,7 @@
             renderRow('row-horror', 'Cine de Terror', endpoints.horrorMovies, 'movie', {title: 'Cine de Terror', fetchUrl: endpoints.horrorMovies, mediaType: 'movie'});
             renderRow('row-cartoon', 'Aventuras Animadas', endpoints.cartoonNetwork, 'tv', {title: 'Aventuras Animadas', fetchUrl: endpoints.cartoonNetwork, mediaType: 'tv'});
             renderRow('row-action', 'Películas de Acción', endpoints.actionMovies, 'movie', {title: 'Películas de Acción', fetchUrl: endpoints.actionMovies, mediaType: 'movie'});
-            renderRow('row-anime', 'Anime Destacado', endpoints.anime, 'tv', {title: 'Anime Destacado', fetchUrl: endpoints.anime, mediaType: 'tv'});
+            renderRow('row-anime', 'Anime de Pelea', endpoints.anime, 'tv', {title: 'Anime de Pelea', fetchUrl: endpoints.anime, mediaType: 'tv'});
             renderRow('row-romance', 'Romance', endpoints.romanceMovies, 'movie', {title: 'Romance', fetchUrl: endpoints.romanceMovies, mediaType: 'movie'});
         }
 
@@ -489,14 +512,27 @@
                 <div class="pt-24 pb-12 min-h-screen fade-in">
                     <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Anime</h1>
                     <div id="row-pop-anime"></div>
+                    <div id="row-misterio"></div>
+                    <div id="row-aventura"></div>
                     <div id="row-shonen"></div>
                     <div id="row-new-anime"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Anime', fetchUrl: '${endpoints.anime}', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Anime
+                        </button>
+                    </div>
                 </div>
             `;
             const shonenUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16,10759&with_original_language=ja&language=es-ES`;
+            const misterioUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16,9648&with_original_language=ja&language=es-ES`;
+            const aventuraUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16,12&with_original_language=ja&language=es-ES`;
             const newUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16&with_original_language=ja&sort_by=first_air_date.desc&language=es-ES`;
             
-            renderRow('row-pop-anime', 'Anime Popular', endpoints.anime, 'tv', {title: 'Anime Popular', fetchUrl: endpoints.anime, mediaType: 'tv'});
+            renderRow('row-pop-anime', 'Anime Misterio', endpoints.anime, 'tv', {title: 'Anime Misterio', fetchUrl: endpoints.anime, mediaType: 'tv'});
+            renderRow('row-misterio', 'Anime Misterio', misterioUrl, 'tv', {title: 'Anime Misterio', fetchUrl: misterioUrl, mediaType: 'tv'});
+            renderRow('row-aventura', 'Anime de Aventura', aventuraUrl, 'tv', {title: 'Anime de Aventura', fetchUrl: aventuraUrl, mediaType: 'tv'});
             renderRow('row-shonen', 'Acción y Shonen', shonenUrl, 'tv', {title: 'Acción y Shonen', fetchUrl: shonenUrl, mediaType: 'tv'});
             renderRow('row-new-anime', 'Nuevos Episodios', newUrl, 'tv', {title: 'Nuevos Episodios', fetchUrl: newUrl, mediaType: 'tv'});
         }
@@ -512,13 +548,20 @@
                     <div id="row-prime-accion"></div>
                     <div id="row-prime-drama"></div>
                     <div id="row-prime-thriller"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Prime Video', fetchUrl: '/discover/movie?api_key=${API_KEY}&with_networks=1024&language=es-ES', mediaType: 'movie'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Prime Video
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-prime-estrenos', 'Estrenos Prime Video', `/discover/movie?api_key=${API_KEY}&with_networks=1024&sort_by=release_date.desc&language=es-ES`, 'movie');
-            renderRow('row-prime-comedia', 'Comedia en Prime', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=35&language=es-ES`, 'movie');
-            renderRow('row-prime-accion', 'Acción y Aventura', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=28&language=es-ES`, 'movie');
-            renderRow('row-prime-drama', 'Drama', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=18&language=es-ES`, 'movie');
-            renderRow('row-prime-thriller', 'Thriller y Suspenso', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=53&language=es-ES`, 'movie');
+            renderRow('row-prime-estrenos', 'Estrenos Prime Video', `/discover/movie?api_key=${API_KEY}&with_networks=1024&sort_by=release_date.desc&language=es-ES`, 'movie', {title: 'Estrenos Prime Video', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=1024&sort_by=release_date.desc&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-prime-comedia', 'Comedia en Prime', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=35&language=es-ES`, 'movie', {title: 'Comedia en Prime', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=35&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-prime-accion', 'Acción y Aventura', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=28&language=es-ES`, 'movie', {title: 'Acción y Aventura', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=28&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-prime-drama', 'Drama', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=18&language=es-ES`, 'movie', {title: 'Drama', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=18&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-prime-thriller', 'Thriller y Suspenso', `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=53&language=es-ES`, 'movie', {title: 'Thriller y Suspenso', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=1024&with_genres=53&language=es-ES`, mediaType: 'movie'});
         }
 
         async function renderAppleTV() {
@@ -529,12 +572,19 @@
                     <div id="row-appletv-drama"></div>
                     <div id="row-appletv-scifi"></div>
                     <div id="row-appletv-comedia"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Apple TV+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=2552&language=es-ES', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Apple TV+
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-appletv-estrenos', 'Estrenos Apple TV+', `/discover/tv?api_key=${API_KEY}&with_networks=2552&sort_by=first_air_date.desc&language=es-ES`, 'tv');
-            renderRow('row-appletv-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=18&language=es-ES`, 'tv');
-            renderRow('row-appletv-scifi', 'Ciencia Ficción', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=10765&language=es-ES`, 'tv');
-            renderRow('row-appletv-comedia', 'Comedia', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=35&language=es-ES`, 'tv');
+            renderRow('row-appletv-estrenos', 'Estrenos Apple TV+', `/discover/tv?api_key=${API_KEY}&with_networks=2552&sort_by=first_air_date.desc&language=es-ES`, 'tv', {title: 'Estrenos Apple TV+', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=2552&sort_by=first_air_date.desc&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-appletv-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=18&language=es-ES`, 'tv', {title: 'Drama', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=18&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-appletv-scifi', 'Ciencia Ficción', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=10765&language=es-ES`, 'tv', {title: 'Ciencia Ficción', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=10765&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-appletv-comedia', 'Comedia', `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=35&language=es-ES`, 'tv', {title: 'Comedia', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=2552&with_genres=35&language=es-ES`, mediaType: 'tv'});
         }
 
         async function renderHulu() {
@@ -545,12 +595,19 @@
                     <div id="row-hulu-comedia"></div>
                     <div id="row-hulu-drama"></div>
                     <div id="row-hulu-crime"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Hulu', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=453&language=es-ES', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Hulu
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-hulu-estrenos', 'Estrenos en Hulu', `/discover/tv?api_key=${API_KEY}&with_networks=453&sort_by=first_air_date.desc&language=es-ES`, 'tv');
-            renderRow('row-hulu-comedia', 'Comedia', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=35&language=es-ES`, 'tv');
-            renderRow('row-hulu-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=18&language=es-ES`, 'tv');
-            renderRow('row-hulu-crime', 'Crimen y Suspenso', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=80&language=es-ES`, 'tv');
+            renderRow('row-hulu-estrenos', 'Estrenos en Hulu', `/discover/tv?api_key=${API_KEY}&with_networks=453&sort_by=first_air_date.desc&language=es-ES`, 'tv', {title: 'Estrenos en Hulu', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=453&sort_by=first_air_date.desc&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-hulu-comedia', 'Comedia', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=35&language=es-ES`, 'tv', {title: 'Comedia', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=35&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-hulu-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=18&language=es-ES`, 'tv', {title: 'Drama', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=18&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-hulu-crime', 'Crimen y Suspenso', `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=80&language=es-ES`, 'tv', {title: 'Crimen y Suspenso', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=453&with_genres=80&language=es-ES`, mediaType: 'tv'});
         }
 
         async function renderEstrenos() {
@@ -561,8 +618,8 @@
                     <div id="row-estrenos-series"></div>
                 </div>
             `;
-            renderRow('row-estrenos-movies', 'Estrenos - Películas', `/movie/now_playing?api_key=${API_KEY}&language=es-ES`, 'movie');
-            renderRow('row-estrenos-series', 'Estrenos - Series', `/tv/on_the_air?api_key=${API_KEY}&language=es-ES`, 'tv');
+            renderRow('row-estrenos-movies', 'Estrenos - Películas', `/movie/now_playing?api_key=${API_KEY}&language=es-ES`, 'movie', {title: 'Estrenos - Películas', fetchUrl: `/movie/now_playing?api_key=${API_KEY}&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-estrenos-series', 'Estrenos - Series', `/tv/on_the_air?api_key=${API_KEY}&language=es-ES`, 'tv', {title: 'Estrenos - Series', fetchUrl: `/tv/on_the_air?api_key=${API_KEY}&language=es-ES`, mediaType: 'tv'});
         }
 
         async function renderParamount() {
@@ -572,11 +629,18 @@
                     <div id="row-paramount-estrenos"></div>
                     <div id="row-paramount-action"></div>
                     <div id="row-paramount-comedia"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Paramount+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=4339&language=es-ES', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Paramount+
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-paramount-estrenos', 'Estrenos Paramount+', `/discover/tv?api_key=${API_KEY}&with_networks=4339&sort_by=first_air_date.desc&language=es-ES`, 'tv');
-            renderRow('row-paramount-action', 'Acción', `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=28&language=es-ES`, 'movie');
-            renderRow('row-paramount-comedia', 'Comedia', `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=35&language=es-ES`, 'movie');
+            renderRow('row-paramount-estrenos', 'Estrenos Paramount+', `/discover/tv?api_key=${API_KEY}&with_networks=4339&sort_by=first_air_date.desc&language=es-ES`, 'tv', {title: 'Estrenos Paramount+', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=4339&sort_by=first_air_date.desc&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-paramount-action', 'Acción', `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=28&language=es-ES`, 'movie', {title: 'Acción', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=28&language=es-ES`, mediaType: 'movie'});
+            renderRow('row-paramount-comedia', 'Comedia', `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=35&language=es-ES`, 'movie', {title: 'Comedia', fetchUrl: `/discover/movie?api_key=${API_KEY}&with_networks=4339&with_genres=35&language=es-ES`, mediaType: 'movie'});
         }
 
         async function renderAMC() {
@@ -586,25 +650,39 @@
                     <div id="row-amc-horror"></div>
                     <div id="row-amc-drama"></div>
                     <div id="row-amc-thriller"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - AMC+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=174&language=es-ES', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de AMC+
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-amc-horror', 'Terror y Suspenso', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=27&language=es-ES`, 'tv');
-            renderRow('row-amc-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=18&language=es-ES`, 'tv');
-            renderRow('row-amc-thriller', 'Thriller', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=53&language=es-ES`, 'tv');
+            renderRow('row-amc-horror', 'Terror y Suspenso', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=27&language=es-ES`, 'tv', {title: 'Terror y Suspenso', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=27&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-amc-drama', 'Drama', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=18&language=es-ES`, 'tv', {title: 'Drama', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=18&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-amc-thriller', 'Thriller', `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=53&language=es-ES`, 'tv', {title: 'Thriller', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=174&with_genres=53&language=es-ES`, mediaType: 'tv'});
         }
 
-        async function renderAdultSwim() {
+        async function renderNickelodeon() {
             appContent.innerHTML = `
                 <div class="pt-24 pb-12 min-h-screen fade-in">
-                    <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Adult Swim</h1>
-                    <div id="row-adultswim-anime"></div>
-                    <div id="row-adultswim-comedia"></div>
-                    <div id="row-adultswim-absurdo"></div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Nickelodeon</h1>
+                    <div id="row-nick-anime"></div>
+                    <div id="row-nick-comedia"></div>
+                    <div id="row-nick-infantil"></div>
+                    <!-- Catálogo Completo -->
+                    <div class="px-4 md:px-12 my-8">
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Nickelodeon', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES', mediaType: 'tv'})" 
+                                class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Nickelodeon
+                        </button>
+                    </div>
                 </div>
             `;
-            renderRow('row-adultswim-anime', 'Anime y Animación', `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=16&language=es-ES`, 'tv');
-            renderRow('row-adultswim-comedia', 'Comedia Adulta', `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=35&language=es-ES`, 'tv');
-            renderRow('row-adultswim-absurdo', 'Contenido Absurdo', `/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES`, 'tv');
+            renderRow('row-nick-anime', 'Animación y Anime', `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=16&language=es-ES`, 'tv', {title: 'Animación y Anime', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=16&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-nick-comedia', 'Comedia Infantil', `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=35&language=es-ES`, 'tv', {title: 'Comedia Infantil', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=56&with_genres=35&language=es-ES`, mediaType: 'tv'});
+            renderRow('row-nick-infantil', 'Series Infantiles', `/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES`, 'tv', {title: 'Series Infantiles', fetchUrl: `/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES`, mediaType: 'tv'});
         }
 
         function renderFavorites() {
@@ -716,6 +794,7 @@
             currentTab = tabId;
             updateNavUI(tabId);
             mobileMenu.classList.add('hidden');
+            sidebar.classList.add('translate-x-full');
             window.scrollTo(0, 0);
 
             switch (tabId) {
@@ -729,7 +808,7 @@
                 case 'estrenos': renderEstrenos(); break;
                 case 'paramount': renderParamount(); break;
                 case 'amc': renderAMC(); break;
-                case 'adultswim': renderAdultSwim(); break;
+                case 'nickelodeon': renderNickelodeon(); break;
                 case 'favorites': renderFavorites(); break;
             }
         }
@@ -1015,4 +1094,4 @@
 
     </script>
 </body>
-</html>
+</html>  
