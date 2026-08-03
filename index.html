@@ -7,6 +7,12 @@
     <script src="https://unpkg.com/tailwindcss-cdn@latest/tailwindcss.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/astroide/manifest.json">
+<meta name="theme-color" content="#09090b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CaracasFlix">
+<link rel="apple-touch-icon" href="/astroide/icons/icon-192.png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -1353,10 +1359,21 @@
         videoPlayer.addEventListener('mousemove', resetPlayerHideTimer);
         videoPlayer.addEventListener('click', resetPlayerHideTimer);
 
-        // Initialize App
-        hydrateCacheFromLocal();
-        navigate('home');
+            // Initialize App
+    hydrateCacheFromLocal();
+    navigate('home');
 
+    </script>
+
+    <!-- Service Worker PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/astroide/sw.js')
+            .then(reg => console.log('SW registrado:', reg.scope))
+            .catch(err => console.error('Error SW:', err));
+        });
+      }
     </script>
 </body>
 </html>
