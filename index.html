@@ -452,8 +452,6 @@
                 <div id="row-horror"></div>
                 <div id="row-action"></div>
                 <div id="row-romance"></div>
-                <div id="row-telenovelas"></div>
-                <div id="row-anime"></div>
             `;
             
             document.getElementById('hero-container').innerHTML = await renderHero();
@@ -540,7 +538,6 @@
              appContent.innerHTML = `
                 <div class="pt-24 pb-12 min-h-screen fade-in">
                     <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Anime</h1>
-                    <div id="row-pop-anime"></div>
                     <div id="row-misterio"></div>
                     <div id="row-aventura"></div>
                     <div id="row-shonen"></div>
@@ -754,14 +751,14 @@
         async function renderNickelodeon() {
             appContent.innerHTML = `
                 <div class="pt-24 pb-12 min-h-screen fade-in">
-                    <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Nickelodeon</h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Animacion</h1>
                     <div id="row-nick-comedia"></div>
                     <div id="row-nick-infantil"></div>
                     <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
-                        <button onclick="renderGrid({title: 'Catálogo Completo - Nickelodeon', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES', mediaType: 'tv'})" 
+                        <button onclick="renderGrid({title: 'Catálogo Completo - Animaciones', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
-                            <i class="fa-solid fa-list"></i> Catálogo Completo de Nickelodeon
+                            <i class="fa-solid fa-list"></i> Catálogo Completo de Animacion
                         </button>
                     </div>
                 </div>
