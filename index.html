@@ -10,20 +10,13 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* zinc-950 */
+            background-color: #09090b;
             color: white;
             overflow-x: hidden;
         }
-        /* Custom scrollbar for horizontal rows to hide it visually but keep functionality */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Modal Transitions */
         .modal-enter {
             opacity: 0;
             transform: scale(0.95);
@@ -34,9 +27,7 @@
             transform: scale(1);
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -55,7 +46,6 @@
             overflow: hidden;
         }
         
-        /* Video Player overlay transition */
         #player-controls {
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
@@ -65,7 +55,6 @@
             pointer-events: none;
         }
 
-        /* Sidebar */
         #sidebar {
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }
@@ -100,7 +89,6 @@
             </div>
         </div>
         
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden lg:hidden bg-zinc-950 border-t border-zinc-900 p-4 flex flex-col gap-4 absolute w-full left-0 top-full shadow-xl">
             <form id="mobile-search-form" class="relative w-full">
                 <input type="text" id="mobile-search-input" placeholder="Buscar..." class="bg-zinc-900 w-full text-white rounded px-4 py-3 pl-10 outline-none border border-zinc-800">
@@ -126,11 +114,14 @@
             </div>
             
             <div class="flex flex-col gap-2">
-                <!-- Películas y Series -->
+                <!-- Botón de búsqueda en el panel -->
+                <button id="sidebar-search-btn" class="flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left w-full">
+                    <i class="fa-solid fa-magnifying-glass text-red-500"></i> Buscar
+                </button>
+
                 <button data-nav="movies" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-film text-red-500"></i> Películas</button>
                 <button data-nav="series" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-tv text-red-500"></i> Series</button>
 
-                <!-- Plataformas -->
                 <button data-nav="netflix" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-play text-red-600"></i> Netflix</button>
                 <button data-nav="hbo" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-play text-blue-500"></i> HBO Max</button>
                 <button data-nav="disney" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-play text-blue-400"></i> Disney+</button>
@@ -142,6 +133,25 @@
                 <button data-nav="nickelodeon" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-child text-yellow-400"></i> Nickelodeon</button>
                 <button data-nav="estrenos" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-calendar text-purple-500"></i> Estrenos</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de búsqueda del sidebar -->
+    <div id="sidebar-search-modal" class="fixed inset-0 z-[55] bg-black/80 backdrop-blur-sm hidden items-start justify-center pt-24 px-4">
+        <div class="w-full max-w-xl bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="flex items-center gap-3 p-4 border-b border-zinc-800">
+                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                <input type="text" id="sidebar-search-input" placeholder="Buscar títulos, series, anime..." 
+                       class="flex-1 bg-transparent text-white text-lg outline-none placeholder-gray-500" autofocus>
+                <button id="sidebar-search-close" class="text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <form id="sidebar-search-form" class="p-4">
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition">
+                    Buscar
+                </button>
+            </form>
         </div>
     </div>
 
@@ -204,16 +214,15 @@
 
         // State Management
         let currentTab = 'home';
-        let mediaCache = new Map(); // Store fetched media objects by ID for quick access
-        let favorites = JSON.parse(localStorage.getItem('caracasflix_favorites')) || [];
-        let continueWatching = JSON.parse(localStorage.getItem('caracasflix_history')) || [];
+        let mediaCache = new Map();
+        let favorites = [];
+        let continueWatching = [];
         
-        let gridConfig = null; // For infinite scroll views
+        let gridConfig = null;
         let gridPage = 1;
         let gridLoading = false;
         let gridHasMore = true;
 
-        // Player Timeout State
         let playerTimeout;
 
         // DOM Elements
@@ -225,6 +234,118 @@
         const sidebar = document.getElementById('sidebar');
         
         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // ========== LOCAL STORAGE ROBUSTO ==========
+        function safeParse(key, fallback = []) {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return fallback;
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : fallback;
+            } catch (e) {
+                console.warn('Error leyendo localStorage', key, e);
+                return fallback;
+            }
+        }
+
+        function saveFavorites() {
+            try {
+                localStorage.setItem('caracasflix_favorites', JSON.stringify(favorites));
+            } catch (e) {
+                console.error('No se pudo guardar favoritos', e);
+            }
+        }
+
+        function saveHistory() {
+            try {
+                localStorage.setItem('caracasflix_history', JSON.stringify(continueWatching));
+            } catch (e) {
+                console.error('No se pudo guardar historial', e);
+            }
+        }
+
+        // Normaliza y guarda un ítem de media de forma completa y estable
+        function normalizeMediaItem(item) {
+            if (!item || item.id == null) return null;
+            const media_type = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+            return {
+                id: item.id,
+                media_type: media_type,
+                title: item.title || null,
+                name: item.name || null,
+                poster_path: item.poster_path || null,
+                backdrop_path: item.backdrop_path || null,
+                overview: item.overview || '',
+                vote_average: item.vote_average || 0,
+                release_date: item.release_date || null,
+                first_air_date: item.first_air_date || null,
+                season: item.season || null,
+                episode: item.episode || null
+            };
+        }
+
+        function hydrateCacheFromLocal() {
+            favorites = safeParse('caracasflix_favorites', []);
+            continueWatching = safeParse('caracasflix_history', []);
+
+            // Limpiar entradas inválidas y rehidratar cache
+            favorites = favorites.map(normalizeMediaItem).filter(Boolean);
+            continueWatching = continueWatching.map(normalizeMediaItem).filter(Boolean);
+
+            favorites.forEach(item => mediaCache.set(String(item.id), item));
+            continueWatching.forEach(item => {
+                // El historial tiene prioridad de season/episode sobre el cache base
+                const existing = mediaCache.get(String(item.id));
+                if (existing) {
+                    mediaCache.set(String(item.id), { ...existing, ...item });
+                } else {
+                    mediaCache.set(String(item.id), item);
+                }
+            });
+
+            saveFavorites();
+            saveHistory();
+        }
+
+        // Obtiene media desde cache, localStorage o API
+        async function getMediaById(id) {
+            const strId = String(id);
+            if (mediaCache.has(strId)) {
+                return mediaCache.get(strId);
+            }
+
+            // Buscar en historial o favoritos
+            let found = continueWatching.find(i => String(i.id) === strId)
+                     || favorites.find(i => String(i.id) === strId);
+
+            if (found) {
+                mediaCache.set(strId, found);
+                return found;
+            }
+
+            // Intentar fetch como movie y luego tv
+            try {
+                let data = await fetchAPI(`/movie/${strId}?api_key=${API_KEY}&language=es-ES`);
+                if (data && data.id) {
+                    data.media_type = 'movie';
+                    const normalized = normalizeMediaItem(data);
+                    mediaCache.set(strId, normalized);
+                    return normalized;
+                }
+            } catch (_) {}
+
+            try {
+                let data = await fetchAPI(`/tv/${strId}?api_key=${API_KEY}&language=es-ES`);
+                if (data && data.id) {
+                    data.media_type = 'tv';
+                    const normalized = normalizeMediaItem(data);
+                    mediaCache.set(strId, normalized);
+                    return normalized;
+                }
+            } catch (_) {}
+
+            return null;
+        }
 
         // Scroll listener for navbar background
         window.addEventListener('scroll', () => {
@@ -245,6 +366,26 @@
             sidebar.classList.add('translate-x-full');
         });
 
+        // Sidebar search modal
+        const sidebarSearchModal = document.getElementById('sidebar-search-modal');
+        document.getElementById('sidebar-search-btn').addEventListener('click', () => {
+            sidebar.classList.add('translate-x-full');
+            sidebarSearchModal.classList.remove('hidden');
+            sidebarSearchModal.classList.add('flex');
+            setTimeout(() => document.getElementById('sidebar-search-input').focus(), 100);
+        });
+        document.getElementById('sidebar-search-close').addEventListener('click', () => {
+            sidebarSearchModal.classList.add('hidden');
+            sidebarSearchModal.classList.remove('flex');
+            document.getElementById('sidebar-search-input').value = '';
+        });
+        sidebarSearchModal.addEventListener('click', (e) => {
+            if (e.target === sidebarSearchModal) {
+                sidebarSearchModal.classList.add('hidden');
+                sidebarSearchModal.classList.remove('flex');
+            }
+        });
+
         // Fetch Wrapper
         async function fetchAPI(url) {
             try {
@@ -263,7 +404,8 @@
                 if (!item.media_type) {
                     item.media_type = forcedMediaType || (item.first_air_date ? 'tv' : 'movie');
                 }
-                mediaCache.set(String(item.id), item);
+                const normalized = normalizeMediaItem(item);
+                if (normalized) mediaCache.set(String(normalized.id), normalized);
             });
             return items;
         }
@@ -281,9 +423,12 @@
                 favorites.splice(existsIndex, 1);
             } else {
                 const media = mediaCache.get(strId);
-                if (media) favorites.unshift(media);
+                if (media) {
+                    const normalized = normalizeMediaItem(media);
+                    if (normalized) favorites.unshift(normalized);
+                }
             }
-            localStorage.setItem('caracasflix_favorites', JSON.stringify(favorites));
+            saveFavorites();
             
             document.querySelectorAll(`.fav-btn[data-id="${strId}"]`).forEach(btn => {
                 const icon = btn.querySelector('i');
@@ -303,10 +448,21 @@
 
         // History Logic (Continue Watching)
         function addToHistory(media) {
-            continueWatching = continueWatching.filter(item => String(item.id) !== String(media.id));
-            continueWatching.unshift(media);
-            if (continueWatching.length > 15) continueWatching.pop();
-            localStorage.setItem('caracasflix_history', JSON.stringify(continueWatching));
+            const normalized = normalizeMediaItem(media);
+            if (!normalized) return;
+
+            continueWatching = continueWatching.filter(item => String(item.id) !== String(normalized.id));
+            continueWatching.unshift(normalized);
+            if (continueWatching.length > 20) continueWatching.pop();
+            saveHistory();
+
+            // Mantener cache actualizado con season/episode
+            mediaCache.set(String(normalized.id), { ...(mediaCache.get(String(normalized.id)) || {}), ...normalized });
+        }
+
+        // Devuelve info de progreso guardado (temporada/episodio)
+        function getProgress(id) {
+            return continueWatching.find(item => String(item.id) === String(id)) || null;
         }
 
         
@@ -452,6 +608,8 @@
                 <div id="row-horror"></div>
                 <div id="row-action"></div>
                 <div id="row-romance"></div>
+                <div id="row-telenovelas"></div>
+                <div id="row-anime"></div>
             `;
             
             document.getElementById('hero-container').innerHTML = await renderHero();
@@ -466,7 +624,6 @@
 
             renderRow('row-trending', 'Tendencias Ahora', endpoints.trending);
             
-            // Nuevas secciones solicitadas
             const historyUrl = `/discover/movie?api_key=${API_KEY}&with_genres=36&language=es-ES`;
             const musicUrl = `/discover/movie?api_key=${API_KEY}&with_genres=10402&language=es-ES`;
             const warUrl = `/discover/movie?api_key=${API_KEY}&with_genres=10752&language=es-ES`;
@@ -494,7 +651,6 @@
                     <div id="row-comedy"></div>
                     <div id="row-fantasy"></div>
                     <div id="row-horror-movies"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Películas', fetchUrl: '/discover/movie?api_key=${API_KEY}&language=es-ES', mediaType: 'movie'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -519,7 +675,6 @@
                     <div id="row-netflix"></div>
                     <div id="row-hbo"></div>
                     <div id="row-disney"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Series', fetchUrl: '/discover/tv?api_key=${API_KEY}&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -538,11 +693,11 @@
              appContent.innerHTML = `
                 <div class="pt-24 pb-12 min-h-screen fade-in">
                     <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Anime</h1>
+                    <div id="row-pop-anime"></div>
                     <div id="row-misterio"></div>
                     <div id="row-aventura"></div>
                     <div id="row-shonen"></div>
                     <div id="row-new-anime"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Anime', fetchUrl: '${endpoints.anime}', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -556,7 +711,6 @@
             const aventuraUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16,12&with_original_language=ja&language=es-ES`;
             const newUrl = `/discover/tv?api_key=${API_KEY}&with_genres=16&with_original_language=ja&sort_by=first_air_date.desc&language=es-ES`;
             
-            // Eliminada la primera repetición de Misterio
             renderRow('row-pop-anime', 'Anime de Pelea', endpoints.anime, 'tv');
             renderRow('row-misterio', 'Anime Misterio', misterioUrl, 'tv');
             renderRow('row-aventura', 'Anime de Aventura', aventuraUrl, 'tv');
@@ -574,7 +728,6 @@
                     <div id="row-netflix-accion"></div>
                     <div id="row-netflix-drama"></div>
                     <div id="row-netflix-thriller"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Netflix', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=213&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -596,7 +749,6 @@
                     <div id="row-hbo-estrenos"></div>
                     <div id="row-hbo-drama"></div>
                     <div id="row-hbo-scifi"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - HBO', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=49&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -617,7 +769,6 @@
                     <div id="row-disney-estrenos"></div>
                     <div id="row-disney-marvel"></div>
                     <div id="row-disney-starwars"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Disney+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=2739&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -639,7 +790,6 @@
                     <div id="row-prime-comedia"></div>
                     <div id="row-prime-accion"></div>
                     <div id="row-prime-drama"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Prime Video', fetchUrl: '/discover/movie?api_key=${API_KEY}&with_networks=1024&language=es-ES', mediaType: 'movie'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -661,7 +811,6 @@
                     <div id="row-appletv-estrenos"></div>
                     <div id="row-appletv-drama"></div>
                     <div id="row-appletv-scifi"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Apple TV+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=2552&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -682,7 +831,6 @@
                     <div id="row-hulu-estrenos"></div>
                     <div id="row-hulu-comedia"></div>
                     <div id="row-hulu-drama"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Hulu', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=453&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -715,7 +863,6 @@
                     <div id="row-paramount-estrenos"></div>
                     <div id="row-paramount-action"></div>
                     <div id="row-paramount-comedia"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Paramount+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=4339&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -735,7 +882,6 @@
                     <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">AMC+</h1>
                     <div id="row-amc-horror"></div>
                     <div id="row-amc-drama"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - AMC+', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=174&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -754,7 +900,6 @@
                     <h1 class="text-3xl md:text-4xl font-bold text-white px-4 md:px-12 mb-8">Animacion</h1>
                     <div id="row-nick-comedia"></div>
                     <div id="row-nick-infantil"></div>
-                    <!-- Catálogo Completo -->
                     <div class="px-4 md:px-12 my-8">
                         <button onclick="renderGrid({title: 'Catálogo Completo - Animaciones', fetchUrl: '/discover/tv?api_key=${API_KEY}&with_networks=56&language=es-ES', mediaType: 'tv'})" 
                                 class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-red-600 py-6 rounded-2xl text-xl font-semibold transition flex items-center justify-center gap-3">
@@ -838,7 +983,6 @@
                         <h1 class="text-2xl md:text-4xl font-bold text-white">${config.title}</h1>
                     </div>
                     <div id="grid-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                        <!-- Items injected here -->
                     </div>
                     <div id="grid-loader" class="w-full flex justify-center py-10 min-h-[100px]"></div>
                 </div>
@@ -901,14 +1045,17 @@
 
         function handleSearch(e) {
             e.preventDefault();
-            const input = e.target.querySelector('input');
-            const query = input.value.trim();
+            const input = e.target.querySelector('input') || document.getElementById('sidebar-search-input');
+            const query = (input ? input.value : '').trim();
             if (!query) return;
 
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.add('hidden');
             document.getElementById('search-input').value = '';
             document.getElementById('mobile-search-input').value = '';
+            document.getElementById('sidebar-search-input').value = '';
+            sidebarSearchModal.classList.add('hidden');
+            sidebarSearchModal.classList.remove('flex');
             
             updateNavUI('search');
             renderGrid({
@@ -920,6 +1067,7 @@
 
         document.getElementById('search-form').addEventListener('submit', handleSearch);
         document.getElementById('mobile-search-form').addEventListener('submit', handleSearch);
+        document.getElementById('sidebar-search-form').addEventListener('submit', handleSearch);
 
         // Event Delegation for Navigation
         document.body.addEventListener('click', (e) => {
@@ -939,12 +1087,16 @@
 
         
         async function openDetailsModal(mediaId) {
-            const media = mediaCache.get(String(mediaId));
-            if (!media) return;
+            const media = await getMediaById(mediaId);
+            if (!media) {
+                alert('No se pudo cargar este contenido. Intenta de nuevo.');
+                return;
+            }
 
             const isTv = media.media_type === 'tv' || media.first_air_date;
             const type = isTv ? 'tv' : 'movie';
             const isFav = isFavorite(mediaId);
+            const progress = getProgress(mediaId);
             
             detailsModal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -953,27 +1105,39 @@
 
             const details = await fetchAPI(`/${type}/${mediaId}?api_key=${API_KEY}&language=es-ES`);
             
-            const title = media.title || media.name;
-            const imgPath = media.backdrop_path || media.poster_path;
+            // Actualizar cache con datos frescos de la API manteniendo progreso
+            const refreshed = normalizeMediaItem({
+                ...media,
+                ...details,
+                media_type: type,
+                season: progress?.season || media.season,
+                episode: progress?.episode || media.episode
+            });
+            if (refreshed) mediaCache.set(String(mediaId), refreshed);
+
+            const title = media.title || media.name || details.title || details.name;
+            const imgPath = media.backdrop_path || media.poster_path || details.backdrop_path || details.poster_path;
             const bgImg = imgPath ? `${BACKDROP_URL}${imgPath}` : 'https://placehold.co/1920x1080/09090b/09090b';
-            const year = media.release_date ? media.release_date.substring(0,4) : (media.first_air_date ? media.first_air_date.substring(0,4) : '');
-            const overview = media.overview || "No hay una descripción disponible para este título en este momento.";
+            const year = (media.release_date || details.release_date || media.first_air_date || details.first_air_date || '').substring(0,4);
+            const overview = media.overview || details.overview || "No hay una descripción disponible para este título en este momento.";
             
             let seasonsHtml = '';
             let btnPlayText = 'Reproducir';
-            let initialSeason = media.season || 1;
-            let initialEpisode = media.episode || 1;
+            let initialSeason = progress?.season || media.season || 1;
+            let initialEpisode = progress?.episode || media.episode || 1;
+            const hasProgress = !!(progress && (progress.season || progress.episode));
 
             if (isTv && details.seasons) {
                 const validSeasons = details.seasons.filter(s => s.season_number > 0);
                 
                 const seasonOptions = validSeasons.map(s => 
-                    `<option value="${s.season_number}" ${s.season_number === initialSeason ? 'selected' : ''}>Temporada ${s.season_number}</option>`
+                    `<option value="${s.season_number}" ${s.season_number === Number(initialSeason) ? 'selected' : ''}>Temporada ${s.season_number}</option>`
                 ).join('');
                 
                 seasonsHtml = `
                     <div class="bg-zinc-900/80 backdrop-blur p-6 rounded-lg mb-8 border border-zinc-800" id="tv-selectors">
                         <h3 class="text-white text-xl font-semibold mb-4">Selecciona un Episodio</h3>
+                        ${hasProgress ? `<p class="text-red-400 text-sm mb-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Continuaste en T${initialSeason} E${initialEpisode}</p>` : ''}
                         <div class="flex flex-col sm:flex-row gap-4">
                             <div class="flex-1">
                                 <label class="block text-gray-400 text-sm mb-2">Temporada</label>
@@ -989,7 +1153,11 @@
                         </div>
                     </div>
                 `;
-                btnPlayText = `Reproducir T${initialSeason} E${initialEpisode}`;
+                btnPlayText = hasProgress 
+                    ? `Reanudar T${initialSeason} E${initialEpisode}` 
+                    : `Reproducir T${initialSeason} E${initialEpisode}`;
+            } else if (hasProgress) {
+                btnPlayText = 'Seguir viendo';
             }
 
             let sideInfo = '';
@@ -1009,7 +1177,7 @@
 
             detailsContent.innerHTML = `
                 <div class="relative w-full h-[50vh] md:h-[65vh]">
-                    <img src="${bgImg}" alt="${title.replace(/"/g, '&quot;')}" class="w-full h-full object-cover" />
+                    <img src="${bgImg}" alt="${(title || '').replace(/"/g, '&quot;')}" class="w-full h-full object-cover" />
                     <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
                     <button id="close-modal-btn" class="absolute top-6 right-6 p-2 bg-zinc-900/80 hover:bg-white hover:text-black rounded-full transition z-10 text-white shadow-xl w-12 h-12 flex items-center justify-center">
                         <i class="fa-solid fa-xmark text-2xl"></i>
@@ -1022,7 +1190,7 @@
                     <div class="flex flex-col md:flex-row gap-12">
                         <div class="flex-1">
                             <div class="flex items-center flex-wrap gap-4 text-gray-300 text-sm mb-6 font-medium">
-                                <span class="text-green-500 font-bold text-base">${(media.vote_average * 10).toFixed(0)}% Coincidencia</span>
+                                <span class="text-green-500 font-bold text-base">${((media.vote_average || details.vote_average || 0) * 10).toFixed(0)}% Coincidencia</span>
                                 <span>${year}</span>
                                 <span class="border border-gray-500 px-2 py-0.5 rounded text-xs uppercase">${isTv ? 'Serie / Anime' : 'Película'}</span>
                             </div>
@@ -1060,15 +1228,23 @@
                     
                     let opts = '';
                     for (let i = 1; i <= Math.max(1, epCount); i++) {
-                        opts += `<option value="${i}" ${i === initialEpisode ? 'selected' : ''}>Episodio ${i}</option>`;
+                        const selected = (activeS === Number(initialSeason) && i === Number(initialEpisode)) ? 'selected' : '';
+                        opts += `<option value="${i}" ${selected}>Episodio ${i}</option>`;
                     }
                     episodeSelect.innerHTML = opts;
-                    playBtnText.textContent = `Reproducir T${activeS} E${episodeSelect.value}`;
+                    
+                    const isResume = hasProgress && Number(seasonSelect.value) === Number(initialSeason) && Number(episodeSelect.value) === Number(initialEpisode);
+                    playBtnText.textContent = isResume 
+                        ? `Reanudar T${seasonSelect.value} E${episodeSelect.value}` 
+                        : `Reproducir T${seasonSelect.value} E${episodeSelect.value}`;
                 };
 
                 seasonSelect.addEventListener('change', updateEpisodes);
                 episodeSelect.addEventListener('change', () => {
-                    playBtnText.textContent = `Reproducir T${seasonSelect.value} E${episodeSelect.value}`;
+                    const isResume = hasProgress && Number(seasonSelect.value) === Number(initialSeason) && Number(episodeSelect.value) === Number(initialEpisode);
+                    playBtnText.textContent = isResume 
+                        ? `Reanudar T${seasonSelect.value} E${episodeSelect.value}` 
+                        : `Reproducir T${seasonSelect.value} E${episodeSelect.value}`;
                 });
                 
                 updateEpisodes();
@@ -1085,9 +1261,12 @@
         }
 
         
-        function openPlayer(mediaId, specificSeason, specificEpisode) {
-            const media = mediaCache.get(String(mediaId));
-            if (!media) return;
+        async function openPlayer(mediaId, specificSeason, specificEpisode) {
+            const media = await getMediaById(mediaId);
+            if (!media) {
+                alert('No se pudo cargar este contenido.');
+                return;
+            }
 
             const isTv = media.media_type === 'tv' || media.first_air_date;
             
@@ -1098,14 +1277,14 @@
             if (isTv) {
                 const seasonSelect = document.getElementById('season-select');
                 const episodeSelect = document.getElementById('episode-select');
-                const s = specificSeason || (seasonSelect ? seasonSelect.value : 1);
-                const e = specificEpisode || (episodeSelect ? episodeSelect.value : 1);
+                const s = specificSeason || (seasonSelect ? seasonSelect.value : (media.season || 1));
+                const e = specificEpisode || (episodeSelect ? episodeSelect.value : (media.episode || 1));
                 
                 iframeUrl = `https://unlimplay.com/f/embed/tv/${media.id}/${s}/${e}`;
                 subtitle = `<span class="text-gray-400 font-normal ml-2 text-base md:text-xl">(T${s} E${e})</span>`;
                 
-                historyItem.season = s;
-                historyItem.episode = e;
+                historyItem.season = Number(s);
+                historyItem.episode = Number(e);
             } else {
                 iframeUrl = `https://unlimplay.com/f/embed/movie/${media.id}`;
             }
@@ -1128,6 +1307,7 @@
             document.getElementById('iframe-container').innerHTML = '';
             document.body.style.overflow = detailsModal.classList.contains('hidden') ? '' : 'hidden';
             
+            // Refrescar Continuar Viendo en home
             if (currentTab === 'home' && !gridConfig) {
                 renderHome(); 
             }
@@ -1177,6 +1357,7 @@
         videoPlayer.addEventListener('click', resetPlayerHideTimer);
 
         // Initialize App
+        hydrateCacheFromLocal();
         navigate('home');
 
     </script>
