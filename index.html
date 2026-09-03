@@ -182,6 +182,7 @@
                 <button data-nav="amc" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-film text-red-500"></i> AMC+</button>
                 <button data-nav="nickelodeon" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-child text-yellow-400"></i> Nickelodeon</button>
                 <button data-nav="estrenos" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left"><i class="fa-solid fa-calendar text-purple-500"></i> Estrenos</button>
+                <a href="tv.html" class="nav-btn flex items-center gap-3 p-4 rounded-xl hover:bg-zinc-900 transition text-left text-white"><i class="fa-solid fa-tower-broadcast text-red-600"></i> TV en Vivo</a>
             </div>
         </div>
     </div>
@@ -205,7 +206,7 @@
         </div>
     </div>
 
-    <!-- Contenido Principal (Manejado por app.js) -->
+    <!-- Contenido Principal -->
     <main id="app-content" class="min-h-screen pb-12">
     </main>
 
@@ -236,7 +237,11 @@
         </div>
     </div>
 
-    <!-- INTEGRACIÓN COMUNIDAD TELEGRAM -->
+    <!-- =======================================================
+         INTEGRACIÓN COMUNIDAD TELEGRAM (NUEVO)
+    ======================================================= -->
+
+    <!-- ANUNCIO EMERGENTE (Abajo a la Derecha) -->
     <div id="telegram-popup" class="fixed bottom-5 right-5 z-[50] max-w-xs w-[90%] bg-zinc-900/95 backdrop-blur-md border border-zinc-800 border-l-4 border-l-sky-500 rounded-xl p-4 shadow-2xl animate-slide-up">
         <button onclick="cerrarTelegramPopup()" class="absolute top-2 right-3 text-zinc-400 hover:text-white transition text-lg">
             <i class="fa-solid fa-xmark"></i>
@@ -250,12 +255,15 @@
                 <p class="text-xs text-zinc-400 mt-1">Únete a nuestro grupo para enterarte de las últimas novedades y actualizaciones.</p>
             </div>
         </div>
-        <a href="https://t.me/+28lyjRAQcfY0MDU5" target="_blank" onclick="cerrarTelegramPopup()" class="block w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold text-center text-xs py-2 rounded-lg transition">
+        <!-- Recuerda colocar el enlace real de tu grupo de Telegram en el atributo href -->
+        <a href="https://t.me/TU_GRUPO_CARACASFLIX" target="_blank" onclick="cerrarTelegramPopup()" class="block w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold text-center text-xs py-2 rounded-lg transition">
             Unirse al Telegram
         </a>
     </div>
 
-    <a href="https://t.me/+28lyjRAQcfY0MDU5" target="_blank" title="Unirse a Telegram" class="fixed bottom-5 left-5 z-[50] w-12 h-12 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center shadow-lg transition transform hover:scale-110 text-2xl">
+    <!-- BOTÓN FLOTANTE DIRECTO (Abajo a la Izquierda) -->
+    <!-- Recuerda colocar el enlace real de tu grupo de Telegram en el atributo href -->
+    <a href="https://t.me/TU_GRUPO_CARACASFLIX" target="_blank" title="Unirse a Telegram" class="fixed bottom-5 left-5 z-[50] w-12 h-12 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center shadow-lg transition transform hover:scale-110 text-2xl">
         <i class="fa-brands fa-telegram"></i>
     </a>
 
