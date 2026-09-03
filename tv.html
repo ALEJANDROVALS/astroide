@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaracasFlix - TV en Vivo</title>
+    <script src="https://unpkg.com/tailwindcss-cdn@latest/tailwindcss.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: white;
+            overflow-x: hidden;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="selection:bg-red-600 selection:text-white antialiased">
+
+    <!-- Navbar exclusivo de TV -->
+    <nav class="fixed w-full z-45 bg-zinc-950/90 backdrop-blur border-b border-zinc-900 py-4 px-4 md:px-12 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-2xl md:text-3xl font-extrabold text-red-600 tracking-tighter hover:scale-105 transition">
+                CARACASFLIX <span class="text-xs bg-red-600 text-white px-2 py-0.5 rounded uppercase ml-2">TV</span>
+            </a>
+        </div>
+        <a href="index.html" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+            <i class="fa-solid fa-house"></i> Volver al Inicio
+        </a>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="pt-28 px-4 md:px-12 pb-12 min-h-screen fade-in">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-zinc-800 pb-6">
+            <div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-tower-broadcast text-red-600"></i> TV en Vivo / IPTV
+                </h1>
+                <p class="text-gray-400 text-sm mt-1" id="tv-channel-count">Cargando lista de transmisión...</p>
+            </div>
+
+            <!-- Selector de listas / Países -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <select id="tv-playlist-type" onchange="handleTVPlaylistChange(this.value)" 
+                        class="bg-zinc-900 border border-zinc-700 text-white px-4 py-2.5 rounded-xl font-medium outline-none focus:border-red-600 transition">
+                    <option value="novaps">Canales Principales (Novaps)</option>
+                    <option value="country">TV por País (IPTV-Org)</option>
+                </select>
+
+                <select id="tv-country-select" onchange="loadIPTVPlaylist(this.value, this.options[this.selectedIndex].text)" 
+                        class="hidden bg-zinc-900 border border-zinc-700 text-white px-4 py-2.5 rounded-xl font-medium outline-none focus:border-red-600 transition max-w-xs">
+                    <!-- Se llenará dinámicamente -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Buscador de Canales -->
+        <div class="mb-8 relative max-w-xl">
+            <input type="text" id="tv-search-input" oninput="filterTVChannels(this.value)" 
+                   placeholder="Buscar canal por nombre o categoría..." 
+                   class="w-full bg-zinc-900 border border-zinc-700 text-white px-4 py-3 pl-11 rounded-xl outline-none focus:border-red-600 transition text-sm">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
+        </div>
+
+        <!-- Loader -->
+        <div id="tv-loader" class="flex flex-col items-center justify-center py-20 text-center"></div>
+
+        <!-- Grid de Canales -->
+        <div id="tv-channels-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+    </main>
+
+    <!-- Reproductor de Video en Pantalla Completa -->
+    <div id="video-player" class="fixed inset-0 z-50 bg-black hidden flex-col">
+        <div class="absolute top-0 w-full z-10 bg-gradient-to-b from-black/90 to-transparent p-4 flex items-center justify-between">
+            <div id="player-title" class="text-white font-bold text-lg md:text-xl"></div>
+            <button onclick="closePlayer()" class="text-white bg-zinc-800/80 hover:bg-red-600 p-2 rounded-full transition w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div class="flex-1 w-full h-full flex items-center justify-center" id="iframe-container">
+            <video id="live-video" controls autoplay class="w-full h-full object-contain bg-black"></video>
+        </div>
+    </div>
+
+    <!-- Script de Funcionalidad -->
+    <script>
+        const NOVAPS_TV_URL = 'https://raw.githubusercontent.com/NOVAPSNew/Novaps/refs/heads/main/tv.m3u';
+        let loadedChannels = [];
+        let activeHls = null;
+
+        const iptvCountries = [
+            { name: "Argentina", url: "https://iptv-org.github.io/iptv/countries/ar.m3u" },
+            { name: "Colombia", url: "https://iptv-org.github.io/iptv/countries/co.m3u" },
+            { name: "España", url: "https://iptv-org.github.io/iptv/countries/es.m3u" },
+            { name: "México", url: "https://iptv-org.github.io/iptv/countries/mx.m3u" },
+            { name: "Estados Unidos", url: "https://iptv-org.github.io/iptv/countries/us.m3u" },
+            { name: "Venezuela", url: "https://iptv-org.github.io/iptv/countries/ve.m3u" }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const countrySelect = document.getElementById('tv-country-select');
+            countrySelect.innerHTML = iptvCountries.map(c => `<option value="${c.url}">${c.name}</option>`).join('');
+            loadIPTVPlaylist(NOVAPS_TV_URL, 'Canales Principales');
+        });
+
+        function parseM3U(m3uText) {
+            const lines = m3uText.split('\n');
+            const channels = [];
+            let currentChannel = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (line.startsWith('#EXTINF:')) {
+                    currentChannel = {};
+                    const nameParts = line.split(',');
+                    currentChannel.name = nameParts.length > 1 ? nameParts.slice(1).join(',').trim() : 'Canal sin nombre';
+                    const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+                    currentChannel.logo = logoMatch ? logoMatch[1] : '';
+                    const groupMatch = line.match(/group-title="([^"]+)"/i);
+                    currentChannel.group = groupMatch ? groupMatch[1] : 'General';
+                } else if (line && !line.startsWith('#')) {
+                    if (currentChannel) {
+                        currentChannel.url = line;
+                        channels.push(currentChannel);
+                        currentChannel = null;
+                    } else {
+                        channels.push({ name: 'Canal Live', logo: '', group: 'General', url: line });
+                    }
+                }
+            }
+            return channels;
+        }
+
+        async function loadIPTVPlaylist(m3uUrl, playlistTitle) {
+            const gridContainer = document.getElementById('tv-channels-grid');
+            const loader = document.getElementById('tv-loader');
+            
+            if (gridContainer) gridContainer.innerHTML = '';
+            if (loader) loader.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-red-600 text-4xl"></i><p class="mt-3 text-gray-400">Cargando canales de ${playlistTitle}...</p>`;
+
+            try {
+                const res = await fetch(m3uUrl);
+                if (!res.ok) throw new Error('No se pudo descargar la lista');
+                const text = await res.text();
+                loadedChannels = parseM3U(text);
+                if (loader) loader.innerHTML = '';
+                renderTVChannelsGrid(loadedChannels);
+            } catch (err) {
+                if (loader) loader.innerHTML = `<p class="text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Error al cargar canales.</p>`;
+            }
+        }
+
+        function renderTVChannelsGrid(channels) {
+            const gridContainer = document.getElementById('tv-channels-grid');
+            const counterEl = document.getElementById('tv-channel-count');
+            if (counterEl) counterEl.textContent = `${channels.length} Canales Disponibles`;
+
+            if (!channels.length) {
+                gridContainer.innerHTML = `<div class="col-span-full text-center py-16 text-gray-500">No se encontraron canales.</div>`;
+                return;
+            }
+
+            gridContainer.innerHTML = channels.map(ch => {
+                const logo = ch.logo || 'https://placehold.co/300x200/18181b/ffffff?text=TV';
+                const name = ch.name.replace(/"/g, '&quot;');
+                return `
+                    <div onclick="playLiveTV('${encodeURIComponent(ch.url)}', '${name.replace(/'/g, "\\'")}')" 
+                         class="group relative bg-zinc-900 border border-zinc-800 hover:border-red-600 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition hover:scale-105">
+                        <div class="w-full h-24 mb-3 flex items-center justify-center p-2 rounded-lg bg-black/40 overflow-hidden">
+                            <img src="${logo}" alt="${name}" class="max-h-full max-w-full object-contain group-hover:scale-110 transition duration-300" onerror="this.src='https://placehold.co/300x200/18181b/ffffff?text=TV';" />
+                        </div>
+                        <p class="text-white text-sm font-bold line-clamp-2">${ch.name}</p>
+                        <span class="mt-2 text-[10px] bg-red-950/80 text-red-400 border border-red-900/50 px-2 py-0.5 rounded-full uppercase">${ch.group || 'General'}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterTVChannels(query) {
+            const q = query.toLowerCase().trim();
+            if (!q) return renderTVChannelsGrid(loadedChannels);
+            const filtered = loadedChannels.filter(ch => ch.name.toLowerCase().includes(q) || ch.group.toLowerCase().includes(q));
+            renderTVChannelsGrid(filtered);
+        }
+
+        function handleTVPlaylistChange(val) {
+            const countrySelect = document.getElementById('tv-country-select');
+            if (val === 'country') {
+                countrySelect.classList.remove('hidden');
+                loadIPTVPlaylist(countrySelect.value, countrySelect.options[countrySelect.selectedIndex].text);
+            } else {
+                countrySelect.classList.add('hidden');
+                loadIPTVPlaylist(NOVAPS_TV_URL, 'Canales Principales');
+            }
+        }
+
+        function playLiveTV(encodedUrl, channelTitle) {
+            const streamUrl = decodeURIComponent(encodedUrl);
+            document.getElementById('player-title').innerHTML = `
+                <span class="bg-red-600 text-white text-xs px-2 py-0.5 rounded uppercase font-bold mr-2">EN VIVO</span> ${channelTitle}
+            `;
+
+            const video = document.getElementById('live-video');
+            if (activeHls) { activeHls.destroy(); activeHls = null; }
+
+            if (Hls.isSupported() && (streamUrl.includes('.m3u8') || !streamUrl.endsWith('.mp4'))) {
+                const hls = new Hls();
+                activeHls = hls;
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            } else {
+                video.src = streamUrl;
+                video.play();
+            }
+
+            const player = document.getElementById('video-player');
+            player.classList.remove('hidden');
+            player.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePlayer() {
+            const video = document.getElementById('live-video');
+            video.pause();
+            video.src = '';
+            if (activeHls) { activeHls.destroy(); activeHls = null; }
+            const player = document.getElementById('video-player');
+            player.classList.add('hidden');
+            player.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
